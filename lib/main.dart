@@ -37,6 +37,7 @@ class _congestionPageState extends State<congestionPage> {
             Container(
               width: 150,
               height: 50,
+              
               decoration: BoxDecoration(
                 border: Border.all(width: 1.8, color: Colors.black),
                 borderRadius: BorderRadius.circular(10),
@@ -52,9 +53,82 @@ class _congestionPageState extends State<congestionPage> {
               ),
             ),
             Container(
-              width: double.infinity,
+              width: 320,
               child: Text('食堂1'),
             ),
+            Container(
+              width: 340,
+              height: 210,
+              decoration: BoxDecoration(
+                color: Colors.purple,
+                border: Border.all(width: 4),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.all(10),
+                    width: 280,
+                    decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(40),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text('大混雑', 
+                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 50)),
+                      ],
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: Text('')
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(9),
+                            margin: EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text('今日はいつもより人が多いです！')
+                          ),
+                          Container(
+                            margin: EdgeInsets.all(9),
+                            decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(50),
+                            ),
+                            child: ElevatedButton(
+                            child: const Text('評価 : ⭐️⭐️⭐️', style: TextStyle(color: Colors.black,),),
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.white,
+                              shape: const StadiumBorder(),
+                            ),
+                            onPressed: () {},
+                          ),
+
+
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            )
           ],
         ),
       ),
