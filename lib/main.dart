@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:freedom/pages/beacon_scanning_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -7,10 +8,23 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  // @override
+  // Widget build(BuildContext context) {
+  //   return MaterialApp(
+  //     home: congestionPage(),
+  //   );
+  // }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: congestionPage(),
+      theme: ThemeData(
+        brightness: Brightness.light,
+        primarySwatch: Colors.blue,
+      ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+      ),
+      home: const BeaconScanningPage(),
     );
   }
 }
