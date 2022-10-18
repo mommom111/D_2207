@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:freedom/pages/beacon_scanning_page.dart';
+import 'package:freedom/view/pages/beacon_scanning_page.dart';
 
 void main() {
   runApp(const MyApp());
