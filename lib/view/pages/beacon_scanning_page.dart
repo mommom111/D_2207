@@ -31,8 +31,18 @@ class _BeaconScanningPageState extends State<BeaconScanningPage>
   // for websocket
   final TextEditingController _controller = TextEditingController();
   final _channel = WebSocketChannel.connect(
-    Uri.parse('wss://echo.websocket.events'),
+    Uri.parse('wss://echo.websocket.events'), //websocket通信に必要
   );
+
+  Future<void> congestionChange() async  {
+    print('3秒後に切り替わる');
+    Future.delayed(
+      Duration(seconds: 3),
+      () {
+        setState(()=> _channel.sink.add(_beacons.length.toString()),);
+      },
+    );
+  }
 
   @override
   void initState() {
@@ -40,6 +50,7 @@ class _BeaconScanningPageState extends State<BeaconScanningPage>
 
     super.initState();
     listeningState();
+    congestionChange();
   }
 
   ///
@@ -47,6 +58,7 @@ class _BeaconScanningPageState extends State<BeaconScanningPage>
   ///
   listeningState() async {
     print('Listening to bluetooth state');
+    print(_beacons.length);
     _streamBluetooth = flutterBeacon
         .bluetoothStateChanged()
         .listen((BluetoothState state) async {
@@ -184,7 +196,6 @@ class _BeaconScanningPageState extends State<BeaconScanningPage>
     _streamRanging?.cancel();
     _streamBluetooth?.cancel();
     flutterBeacon.close;
-
     super.dispose();
   }
 
@@ -192,7 +203,11 @@ class _BeaconScanningPageState extends State<BeaconScanningPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Scan'),
+        title: Row(
+          children: [
+            Text(_beacons.length.toString()),
+          ],
+        ),
         actions: [
           if (!_authorizationStatusOk && _locationServiceEnabled)
             IconButton(
@@ -289,6 +304,44 @@ class _BeaconScanningPageState extends State<BeaconScanningPage>
           ),
         ],
       ),
+      // body: _beacons.isEmpty
+      //   ? const Center(child: CircularProgressIndicator())
+      //   : ListView(
+      //       children: ListTile.divideTiles(
+      //         context: context,
+      //         tiles: _beacons.map(
+      //           (beacon) {
+      //             return ListTile(
+      //               title: Text(
+      //                 beacon.proximityUUID,
+      //                 style: const TextStyle(fontSize: 15.0),
+      //               ),
+      //               subtitle: Row(
+      //                 mainAxisSize: MainAxisSize.max,
+      //                 children: [
+      //                   Flexible(
+      //                     child: Text(
+      //                       'Major: ${beacon.major}\nMinor: ${beacon.minor}',
+      //                       style: const TextStyle(fontSize: 13.0),
+      //                     ),
+      //                     flex: 1,
+      //                     fit: FlexFit.tight,
+      //                   ),
+      //                   Flexible(
+      //                     child: Text(
+      //                       'Accuracy: ${beacon.accuracy}m\nRSSI: ${beacon.rssi}',
+      //                       style: const TextStyle(fontSize: 13.0),
+      //                     ),
+      //                     flex: 2,
+      //                     fit: FlexFit.tight,
+      //                   ),
+      //                 ],
+      //               ),
+      //             );
+      //           },
+      //         ),
+      //       ).toList(),
+      //     ),
       body: Column(
         children: <Widget>[
           _beacons.isEmpty
@@ -364,5 +417,5 @@ class _BeaconScanningPageState extends State<BeaconScanningPage>
     if (_controller.text.isNotEmpty) {
       _channel.sink.add(_controller.text);
     }
-  }
+  } //1秒に1度送る
 }
