@@ -17,3 +17,7 @@ samples, guidance on mobile development, and a full API reference.
 
 ## setup
 
+flutter build ios
+flutter devices
+flutter install -d 0
+wscat -c wss://echo.websocket.events

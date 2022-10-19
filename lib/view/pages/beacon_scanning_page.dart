@@ -8,6 +8,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_beacon/flutter_beacon.dart';
 import 'package:freedom/util/constants.dart';
 
+// for websocket
+import 'package:web_socket_channel/web_socket_channel.dart';
+
 class BeaconScanningPage extends StatefulWidget {
   const BeaconScanningPage({Key? key}) : super(key: key);
 
@@ -24,6 +27,12 @@ class _BeaconScanningPageState extends State<BeaconScanningPage>
   bool _authorizationStatusOk = false;
   bool _locationServiceEnabled = false;
   bool _bluetoothEnabled = false;
+
+  // for websocket
+  final TextEditingController _controller = TextEditingController();
+  final _channel = WebSocketChannel.connect(
+    Uri.parse('wss://echo.websocket.events'),
+  );
 
   @override
   void initState() {
@@ -280,7 +289,9 @@ class _BeaconScanningPageState extends State<BeaconScanningPage>
           ),
         ],
       ),
-      body: _beacons.isEmpty
+      body: Column(
+        children: <Widget>[
+          _beacons.isEmpty
         ? const Center(child: CircularProgressIndicator())
         : ListView(
             children: ListTile.divideTiles(
@@ -310,7 +321,7 @@ class _BeaconScanningPageState extends State<BeaconScanningPage>
                           ),
                           flex: 2,
                           fit: FlexFit.tight,
-                        )
+                        ),
                       ],
                     ),
                   );
@@ -318,6 +329,40 @@ class _BeaconScanningPageState extends State<BeaconScanningPage>
               ),
             ).toList(),
           ),
+        Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Form(
+                  child: TextFormField(
+                    controller: _controller,
+                    decoration: const InputDecoration(labelText: 'Send a message'),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                StreamBuilder(
+                  stream: _channel.stream,
+                  builder: (context, snapshot) {
+                    return Text(snapshot.hasData ? '${snapshot.data}' : '');
+                  },
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+
+      floatingActionButton: FloatingActionButton(
+        onPressed: _sendMessage,
+        tooltip: 'Send message',
+        child: const Icon(Icons.send),
+      ),
     );
+  }
+
+  void _sendMessage() {
+    if (_controller.text.isNotEmpty) {
+      _channel.sink.add(_controller.text);
+    }
   }
 }
