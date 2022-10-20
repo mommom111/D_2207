@@ -28,21 +28,23 @@ class _BeaconScanningPageState extends State<BeaconScanningPage>
   bool _locationServiceEnabled = false;
   bool _bluetoothEnabled = false;
 
+  int count = 0;
+
   // for websocket
   final TextEditingController _controller = TextEditingController();
   final _channel = WebSocketChannel.connect(
-    Uri.parse('wss://echo.websocket.events'), //websocket通信に必要
+    Uri.parse('ws://localhost:8765'), //websocket通信に必要
   );
 
-  Future<void> congestionChange() async  {
-    print('3秒後に切り替わる');
-    Future.delayed(
-      Duration(seconds: 3),
-      () {
-        setState(()=> _channel.sink.add(_beacons.length.toString()),);
-      },
-    );
-  }
+  // Future<void> congestionChange() async  {
+  //   print('1秒後に切り替わる');
+  //   Future.delayed(
+  //     Duration(seconds: 1),
+  //     () {
+  //       setState(()=> _channel.sink.add(_beacons.length.toString()),);
+  //     },
+  //   );
+  // }
 
   @override
   void initState() {
@@ -50,7 +52,17 @@ class _BeaconScanningPageState extends State<BeaconScanningPage>
 
     super.initState();
     listeningState();
-    congestionChange();
+    // Timer.periodic(
+    //   // 第一引数：繰り返す間隔の時間を設定
+    //   const Duration(seconds: 1),
+    //   // 第二引数：その間隔ごとに動作させたい処理を書く
+    //   (Timer timer) {
+    //     _channel.sink.add(count.toString());
+    //     print(count);
+    //     count++;
+    //     setState(() {});
+    //   },
+    // );
   }
 
   ///
@@ -345,53 +357,81 @@ class _BeaconScanningPageState extends State<BeaconScanningPage>
       body: Column(
         children: <Widget>[
           _beacons.isEmpty
-        ? const Center(child: CircularProgressIndicator())
-        : ListView(
-            children: ListTile.divideTiles(
-              context: context,
-              tiles: _beacons.map(
-                (beacon) {
-                  return ListTile(
-                    title: Text(
-                      beacon.proximityUUID,
-                      style: const TextStyle(fontSize: 15.0),
-                    ),
-                    subtitle: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            'Major: ${beacon.major}\nMinor: ${beacon.minor}',
-                            style: const TextStyle(fontSize: 13.0),
-                          ),
-                          flex: 1,
-                          fit: FlexFit.tight,
-                        ),
-                        Flexible(
-                          child: Text(
-                            'Accuracy: ${beacon.accuracy}m\nRSSI: ${beacon.rssi}',
-                            style: const TextStyle(fontSize: 13.0),
-                          ),
-                          flex: 2,
-                          fit: FlexFit.tight,
-                        ),
-                      ],
-                    ),
-                  );
-                },
+        ? Container(
+            margin: EdgeInsets.all(20), 
+            child: Center(
+              child: Column(children: [
+                CircularProgressIndicator(),
+                Text(
+                  '現在接続されている端末がありません。',
+                  style: TextStyle(
+                    letterSpacing: 2.0,
+                    height: 3.5,
+                  ),
+                )
+              ]),
+            )
+          )
+        : Container(
+          child: Column(
+            children: [
+              Text(
+                '現在、${_beacons.length}台接続されています。',
+                style: TextStyle(
+                  letterSpacing: 2.0,
+                  height: 3.5,
+                ),
               ),
-            ).toList(),
+              Text(
+                'server.pyに${_beacons.length}を送信',
+                style: TextStyle(
+                  letterSpacing: 2.0,
+                  height: 3.5,
+                ),
+              ),
+              ListView(
+                  children: ListTile.divideTiles(
+                    context: context,
+                    tiles: _beacons.map(
+                      (beacon) {
+                        return ListTile(
+                          title: Text(
+                            beacon.proximityUUID,
+                            style: const TextStyle(fontSize: 15.0),
+                          ),
+                          subtitle: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  'Major: ${beacon.major}\nMinor: ${beacon.minor}',
+                                  style: const TextStyle(fontSize: 13.0),
+                                ),
+                                flex: 1,
+                                fit: FlexFit.tight,
+                              ),
+                              Flexible(
+                                child: Text(
+                                  'Accuracy: ${beacon.accuracy}m\nRSSI: ${beacon.rssi}',
+                                  style: const TextStyle(fontSize: 13.0),
+                                ),
+                                flex: 2,
+                                fit: FlexFit.tight,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ).toList(),
+                ),
+            ],
           ),
+        ),
         Flexible(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Form(
-                  child: TextFormField(
-                    controller: _controller,
-                    decoration: const InputDecoration(labelText: 'Send a message'),
-                  ),
-                ),
                 const SizedBox(height: 24),
                 StreamBuilder(
                   stream: _channel.stream,
@@ -405,17 +445,17 @@ class _BeaconScanningPageState extends State<BeaconScanningPage>
         ],
       ),
 
-      floatingActionButton: FloatingActionButton(
-        onPressed: _sendMessage,
-        tooltip: 'Send message',
-        child: const Icon(Icons.send),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   // onPressed: _sendMessage,
+      //   tooltip: 'Send message',
+      //   child: const Icon(Icons.send),
+      // ),
     );
   }
 
-  void _sendMessage() {
-    if (_controller.text.isNotEmpty) {
-      _channel.sink.add(_controller.text);
-    }
-  } //1秒に1度送る
+  // void _sendMessage() {
+  //   if (_controller.text.isNotEmpty) {
+  //     _channel.sink.add(_beacons.length.toString());
+  //   }
+  // } //1秒に1度送る
 }
