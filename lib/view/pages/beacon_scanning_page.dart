@@ -52,17 +52,17 @@ class _BeaconScanningPageState extends State<BeaconScanningPage>
 
     super.initState();
     listeningState();
-    // Timer.periodic(
-    //   // 第一引数：繰り返す間隔の時間を設定
-    //   const Duration(seconds: 1),
-    //   // 第二引数：その間隔ごとに動作させたい処理を書く
-    //   (Timer timer) {
-    //     _channel.sink.add(count.toString());
-    //     print(count);
-    //     count++;
-    //     setState(() {});
-    //   },
-    // );
+    Timer.periodic(
+      // 第一引数：繰り返す間隔の時間を設定
+      const Duration(seconds: 1),
+      // 第二引数：その間隔ごとに動作させたい処理を書く
+      (Timer timer) {
+        _channel.sink.add(count.toString());
+        print(count);
+        count++;
+        setState(() {});
+      },
+    );
   }
 
   ///
